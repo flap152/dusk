@@ -15,3 +15,4 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
 Route::view('tests/wait-for-text-in', 'workbench::wait-for-text-in');
+Route::view('tests/assert-see-in', 'workbench::assert-see-in');
