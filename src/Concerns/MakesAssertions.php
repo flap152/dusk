@@ -189,6 +189,7 @@ trait MakesAssertions
 //          "Did not see expected text [{$text}] within any of the elements [{$selector}]."
             "Did not see expected text [{$text}] within element [{$fullSelector}]." //hard coded in test
         );
+        return $this;
     }
 
     /**
