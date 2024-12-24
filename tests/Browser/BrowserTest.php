@@ -29,7 +29,7 @@ class BrowserTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser->visit('/tests/assert-see-in')
                 ->assertSee( 'Hello World')
-                ->assertDontSee( 'Gesundheit!')
+                ->assertDontSee( 'Gesundheit')
                 ->assertSeeIn('', 'Hello World')
                 ->assertSeeIn('#app > h1', 'Hello World')
                 ->assertSeeIn('#app > div', 'Second')
