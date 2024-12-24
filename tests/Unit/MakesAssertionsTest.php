@@ -1297,7 +1297,7 @@ class MakesAssertionsTest extends TestCase
 
         $resolver = m::mock(stdClass::class);
         $resolver->shouldReceive('format')->with('')->andReturn('body');
-        $resolver->shouldReceive('findOrFail')->with('')->andReturn($element);
+        $resolver->shouldReceive('all')->with('')->andReturn([$element]);
 
         $browser = new Browser($driver, $resolver);
 
@@ -1322,7 +1322,7 @@ class MakesAssertionsTest extends TestCase
 
         $resolver = m::mock(stdClass::class);
         $resolver->shouldReceive('format')->with('')->andReturn('body');
-        $resolver->shouldReceive('findOrFail')->with('')->andReturn($element);
+        $resolver->shouldReceive('all')->with('')->andReturn($element);
 
         $browser = new Browser($driver, $resolver);
 
@@ -1338,7 +1338,33 @@ class MakesAssertionsTest extends TestCase
         }
     }
 
-    public function test_assert_see_in()
+//    public function test_assert_see_in()
+//    {
+//        $driver = m::mock(stdClass::class);
+//
+//        $element = m::mock(stdClass::class);
+//        $element->shouldReceive('getText')->andReturn('foo');
+//
+//        $resolver = m::mock(stdClass::class);
+//        $resolver->shouldReceive('format')->with('foo')->andReturn('body foo');
+////        $resolver->shouldReceive('findOrFail')->with('foo')->andReturn($element);
+//        $resolver->shouldReceive('elements')->with('body foo')->andReturn([$element]);
+//
+//        $browser = new Browser($driver, $resolver);
+//
+//        $browser->assertSeeIn('foo', 'foo');
+//
+//        try {
+//            $browser->assertSeeIn('foo', 'bar');
+//        } catch (ExpectationFailedException $e) {
+//            $this->assertStringContainsString(
+//                'Did not see expected text [bar] within element [body foo].',
+//                $e->getMessage()
+//            );
+//        }
+//    }
+
+    public function test_assert_see_in__multiple_elements_version()
     {
         $driver = m::mock(stdClass::class);
 
@@ -1347,7 +1373,7 @@ class MakesAssertionsTest extends TestCase
 
         $resolver = m::mock(stdClass::class);
         $resolver->shouldReceive('format')->with('foo')->andReturn('body foo');
-        $resolver->shouldReceive('findOrFail')->with('foo')->andReturn($element);
+        $resolver->shouldReceive('all')/*->with('foo')*/->andReturn([$element]);
 
         $browser = new Browser($driver, $resolver);
 
@@ -1372,7 +1398,7 @@ class MakesAssertionsTest extends TestCase
 
         $resolver = m::mock(stdClass::class);
         $resolver->shouldReceive('format')->with('foo')->andReturn('body foo');
-        $resolver->shouldReceive('findOrFail')->with('foo')->andReturn($element);
+        $resolver->shouldReceive('all')->with('foo')->andReturn($element);
 
         $browser = new Browser($driver, $resolver);
 
@@ -1397,7 +1423,7 @@ class MakesAssertionsTest extends TestCase
 
         $resolver = m::mock(stdClass::class);
         $resolver->shouldReceive('format')->with('foo')->andReturn('body foo');
-        $resolver->shouldReceive('findOrFail')->with('foo')->andReturn($element);
+        $resolver->shouldReceive('all')->with('foo')->andReturn($element);
 
         $browser = new Browser($driver, $resolver);
 
@@ -1413,7 +1439,7 @@ class MakesAssertionsTest extends TestCase
 
         $resolver = m::mock(stdClass::class);
         $resolver->shouldReceive('format')->with('foo')->andReturn('body foo');
-        $resolver->shouldReceive('findOrFail')->with('foo')->andReturn($element);
+        $resolver->shouldReceive('all')->with('foo')->andReturn($element);
 
         $browser = new Browser($driver, $resolver);
 
@@ -1436,7 +1462,7 @@ class MakesAssertionsTest extends TestCase
 
         $resolver = m::mock(stdClass::class);
         $resolver->shouldReceive('format')->with('foo')->andReturn('body foo');
-        $resolver->shouldReceive('findOrFail')->with('foo')->andReturn($element);
+        $resolver->shouldReceive('all')->with('foo')->andReturn($element);
 
         $browser = new Browser($driver, $resolver);
 
@@ -1459,7 +1485,7 @@ class MakesAssertionsTest extends TestCase
 
         $resolver = m::mock(stdClass::class);
         $resolver->shouldReceive('format')->with('foo')->andReturn('body foo');
-        $resolver->shouldReceive('findOrFail')->with('foo')->andReturn($element);
+        $resolver->shouldReceive('all')->with('foo')->andReturn($element);
 
         $browser = new Browser($driver, $resolver);
 

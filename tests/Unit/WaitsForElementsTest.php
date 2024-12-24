@@ -5,6 +5,7 @@ namespace Laravel\Dusk\Tests\Unit;
 use Facebook\WebDriver\Exception\TimeOutException;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriver;
+use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverWait;
 use Laravel\Dusk\Browser;
 use Laravel\Dusk\ElementResolver;
@@ -24,19 +25,21 @@ class WaitsForElementsTest extends TestCase
     public function test_when_available()
     {
         $element = m::mock(RemoteWebElement::class);
-        $element->shouldReceive('getText')->andReturn('bar');
-        $element->shouldReceive('isDisplayed')->andReturnTrue();
+        $element->shouldReceive('getText')->atLeast()->once()->andReturn('bar');
+        $element->shouldReceive('isDisplayed')->once()->andReturnTrue();
 
         $driver = m::mock(WebDriver::class);
-        $driver->shouldReceive('wait')->with(5, 100)->andReturnUsing(function ($seconds, $interval) use ($driver) {
-            return new WebDriverWait($driver, $seconds, $interval);
+        $driver->shouldReceive('wait')->twice()->with(5, 100)->andReturnUsing(function ($seconds, $interval) use ($driver) {
+//            return new WebDriverWait($driver, $seconds, $interval);
+            return new WebDriverWait($driver, 1, $interval); //faster return
         });
-        $driver->shouldReceive('findElement')->andReturn($element);
+        $driver->shouldNotHaveReceived('findElement');
+        $driver->shouldReceive('findElements')->once()->andReturn([$element]);
 
         $resolver = m::mock(ElementResolver::class);
-        $resolver->shouldReceive('format')->with('foo')->andReturn('body foo');
-        $resolver->shouldReceive('findOrFail')->with('foo')->andReturn($element);
-        $resolver->shouldReceive('findOrFail')->with('bar')->andThrow(TimeOutException::class, 'Waited 5 seconds for selector [bar].');
+        $resolver->shouldReceive('format')->once()->with('foo')->andReturn('body foo');
+        $resolver->shouldReceive('findOrFail')->atLeast()->once()->with('foo')->andReturn($element);
+        $resolver->shouldReceive('findOrFail')->atLeast()->once()->with('bar')->andThrow(TimeOutException::class, 'Waited 5 seconds for selector [bar].');
 
         $browser = new Browser($driver, $resolver);
 
@@ -52,6 +55,57 @@ class WaitsForElementsTest extends TestCase
             $this->assertSame('Waited 5 seconds for selector [bar].', $e->getMessage());
         }
     }
+
+    public function test_when_available_missing()
+    {
+        $element = m::mock(RemoteWebElement::class);
+
+        $driver = m::mock(WebDriver::class);
+        $driver->shouldReceive('wait')->once()->with(5, 100)->andReturnUsing(function ($seconds, $interval) use ($driver) {
+//            return new WebDriverWait($driver, $seconds, $interval);
+            return new WebDriverWait($driver, 1, $interval); // faster return
+        });
+        $driver->shouldNotHaveReceived('findElement');
+
+        $resolver = m::mock(ElementResolver::class);
+
+        $browser = new Browser($driver, $resolver);
+
+
+        try {
+            $browser->whenAvailable('bar', function ($bar) {
+                // Callback not fired as selector not found
+                self::fail('Callback should not have been fired.');
+            });
+        } catch (TimeOutException $e) {
+            $this->assertSame('Waited 5 seconds for selector [bar].', $e->getMessage());
+        }
+    }
+
+    public function test_when_available_present()
+    {
+        $element = m::mock(RemoteWebElement::class);
+        $element->shouldReceive('getText')->andReturn('bar');
+        $element->shouldReceive('isDisplayed')->andReturnTrue();
+
+        $driver = m::mock(WebDriver::class);
+        $driver->shouldReceive('wait')->with(5, 100)->andReturnUsing(function ($seconds, $interval) use ($driver) {
+            return new WebDriverWait($driver, $seconds, $interval);
+        });
+        $driver->shouldNotHaveReceived('findElement');
+        $driver->shouldReceive('findElements')->once()->andReturn([$element]);
+
+        $resolver = m::mock(ElementResolver::class);
+        $resolver->shouldReceive('format')->once()->with('foo')->andReturn('body foo');
+        $resolver->shouldReceive('findOrFail')->once()->with('foo')->andReturn($element);
+
+        $browser = new Browser($driver, $resolver);
+
+        $browser->whenAvailable('foo', function ($foo) {
+            $foo->assertSee('bar');
+        });
+    }
+
 
     public function test_default_wait_time()
     {
@@ -391,16 +445,19 @@ class WaitsForElementsTest extends TestCase
     public function test_wait_for_text_in()
     {
         $element = m::mock(RemoteWebElement::class);
-        $element->shouldReceive('getText')->andReturn('Discount: 20%');
+        $element->shouldReceive('getText')->once()->andReturn('Discount: 20%');
 
         $driver = m::mock(WebDriver::class);
+//        $driver->shouldReceive('wait')->with(5, 100)->andReturnUsing(function ($seconds, $interval) use ($driver) {
         $driver->shouldReceive('wait')->with(2, 100)->andReturnUsing(function ($seconds, $interval) use ($driver) {
-            return new WebDriverWait($driver, $seconds, $interval);
+            return new WebDriverWait($driver, 1, $interval);
         });
 
         $resolver = m::mock(ElementResolver::class);
         $resolver->shouldReceive('format')->with('foo')->andReturn('body foo');
-        $resolver->shouldReceive('findOrFail')->with('foo')->andReturn($element);
+//        $resolver->shouldReceive('findOrFail')->with('foo')->andReturn($element);
+        $resolver->shouldNotHaveReceived('findOrFail');
+        $resolver->shouldReceive('all')->with('foo')->andReturn([$element]);
 
         $browser = new Browser($driver, $resolver);
 

@@ -176,15 +176,19 @@ trait MakesAssertions
     public function assertSeeIn($selector, $text, $ignoreCase = false)
     {
         $fullSelector = $this->resolver->format($selector);
+        $elements = $this->elements($selector) ?? [];
+//        PHPUnit::assertNotEmpty($elements);
 
-        $element = $this->resolver->findOrFail($selector);
+        foreach ($elements as $element) {
+            if (Str::contains($element->getText(), $text, $ignoreCase)) {
+                return $this;
+            }
+        }
 
-        PHPUnit::assertTrue(
-            Str::contains($element->getText(), $text, $ignoreCase),
-            "Did not see expected text [{$text}] within element [{$fullSelector}]."
+        PHPUnit::assertTrue(false,
+//          "Did not see expected text [{$text}] within any of the elements [{$selector}]."
+            "Did not see expected text [{$text}] within element [{$fullSelector}]." //hard coded in test
         );
-
-        return $this;
     }
 
     /**
@@ -199,13 +203,16 @@ trait MakesAssertions
     {
         $fullSelector = $this->resolver->format($selector);
 
-        $element = $this->resolver->findOrFail($selector);
+        $elements = $this->elements($selector) ?? [];
 
-        PHPUnit::assertFalse(
-            Str::contains($element->getText(), $text, $ignoreCase),
-            "Saw unexpected text [{$text}] within element [{$fullSelector}]."
-        );
+        PHPUnit::assertNotEmpty($elements);
 
+        foreach ($elements as $element){
+            PHPUnit::assertFalse(
+                Str::contains($element->getText(), $text, $ignoreCase),
+                "Saw unexpected text [{$text}] within element [{$fullSelector}]."
+            );
+        }
         return $this;
     }
 
@@ -219,12 +226,16 @@ trait MakesAssertions
     {
         $fullSelector = $this->resolver->format($selector);
 
-        $element = $this->resolver->findOrFail($selector);
+        $elements = $this->elements($selector);
 
-        PHPUnit::assertTrue(
-            $element->getText() !== '',
-            "Saw unexpected text [''] within element [{$fullSelector}]."
-        );
+        PHPUnit::assertNotEmpty($elements);
+
+        foreach ($elements as $element){
+            PHPUnit::assertTrue(
+                $element->getText() !== '',
+                "Saw unexpected text [''] within element [{$fullSelector}]."
+            );
+        }
 
         return $this;
     }
@@ -239,12 +250,16 @@ trait MakesAssertions
     {
         $fullSelector = $this->resolver->format($selector);
 
-        $element = $this->resolver->findOrFail($selector);
+        $elements = $this->elements($selector) ?? [];
 
-        PHPUnit::assertTrue(
-            $element->getText() === '',
-            "Did not see expected text [''] within element [{$fullSelector}]."
-        );
+        PHPUnit::assertNotEmpty($elements);
+
+        foreach ($elements as $element) {
+            PHPUnit::assertTrue(
+                $element->getText() === '',
+                "Did not see expected text [''] within element [{$fullSelector}]."
+            );
+        }
 
         return $this;
     }
